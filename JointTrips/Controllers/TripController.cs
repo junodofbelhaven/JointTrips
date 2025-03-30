@@ -135,6 +135,9 @@ namespace JointTrips.Controllers
             if (id != trip.Id)
                 return NotFound();
 
+            ModelState.Remove("OwnerId");
+            ModelState.Remove("Owner");
+
             var user = await _userManager.GetUserAsync(User);
             var existingTrip = await _context.Trips.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
 
