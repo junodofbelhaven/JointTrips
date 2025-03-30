@@ -1,0 +1,49 @@
+﻿@{
+	ViewBag.Title = "JointTrips - Home";
+}
+<body class="bg-light">
+	<div class="container mt-5">
+		<div class="text-center mb-5">
+			<h1 class="display-4">Welcome to JointTrips!</h1>
+			<p class="lead">Join upcoming trips, create your own tour proposals, and connect with fellow travelers.</p>
+			<hr />
+			@if (User.Identity.IsAuthenticated)
+			{
+				<a href="/Trip/Create" class="btn btn-primary btn-lg mt-3">Create a New Trip</a>
+				<a href="/Trip" class="btn btn-outline-secondary btn-lg mt-3">View All Trips</a>
+			}
+			else
+			{
+				<a href="/Identity/Account/Register" class="btn btn-success btn-lg mt-3 me-2">Register</a>
+				<a href="/Identity/Account/Login" class="btn btn-outline-primary btn-lg mt-3">Login</a>
+			}
+		</div>
+
+		<div class="row">
+			<div class="col-md-4">
+				<div class="card shadow-sm h-100">
+					<div class="card-body">
+						<h5 class="card-title">📍 Propose a Trip</h5>
+						<p class="card-text">Set a destination, date, and capacity – then invite others to join your adventure.</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 mt-4 mt-md-0">
+				<div class="card shadow-sm h-100">
+					<div class="card-body">
+						<h5 class="card-title">🧳 Join Upcoming Trips</h5>
+						<p class="card-text">Browse future trips and secure your spot before it fills up.</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 mt-4 mt-md-0">
+				<div class="card shadow-sm h-100">
+					<div class="card-body">
+						<h5 class="card-title">🤝 Meet New People</h5>
+						<p class="card-text">Travel with like-minded explorers and build new friendships.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
