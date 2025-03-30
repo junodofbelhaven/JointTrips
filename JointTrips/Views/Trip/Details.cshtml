@@ -1,0 +1,58 @@
+﻿@model JointTrips.Models.Trip
+
+@{
+	ViewData["Title"] = "Trip Details";
+	var participantCount = Model.Participants?.Count ?? 0;
+	var isFull = participantCount >= Model.Capacity;
+	var currentUserId = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value : null;
+	var isParticipant = Model.Participants.Any(p => p.Id == currentUserId);
+	var isOwner = Model.OwnerId == currentUserId;
+}
+
+<h2>@Model.Title</h2>
+
+<div class="card">
+	<div class="card-body">
+		<p><strong>Description:</strong> @Model.Description</p>
+		<p><strong>Destination:</strong> @Model.Destination</p>
+		<p><strong>Date:</strong> @Model.Date.ToShortDateString()</p>
+		<p><strong>Owner:</strong> @Model.Owner?.UserName</p>
+		<p><strong>Capacity:</strong> @Model.Capacity</p>
+		<p><strong>Participants:</strong> @participantCount</p>
+		<p><strong>Fullness:</strong> @(participantCount) / @(Model.Capacity))%</p>
+
+		@if (User.Identity.IsAuthenticated)
+		{
+			if (isOwner)
+			{
+				<span class="badge bg-info">You are the owner of this trip.</span>
+				<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2 mt-3">Edit</a>
+				<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger mt-3">Delete</a>
+			}
+			else if (isParticipant)
+			{
+				<form asp-action="Leave" method="post" asp-route-id="@Model.Id" class="mt-3">
+					@Html.AntiForgeryToken()
+					<button type="submit" class="btn btn-danger">Leave Trip</button>
+				</form>
+			}
+			else if (!isFull)
+			{
+				<form asp-action="Join" method="post" asp-route-id="@Model.Id" class="mt-3">
+					@Html.AntiForgeryToken()
+					<button type="submit" class="btn btn-success">Join Trip</button>
+				</form>
+			}
+			else
+			{
+				<div class="alert alert-warning mt-3">This trip is full.</div>
+			}
+		}
+		else
+		{
+			<a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary mt-3">Log in to join</a>
+		}
+	</div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-4">Back to List</a>
