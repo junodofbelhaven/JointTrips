@@ -22,7 +22,21 @@ namespace JointTrips.Data
             builder.Entity<Trip>()
                 .HasMany(t => t.Participants)
                 .WithMany(u => u.TripsJoined)
-                .UsingEntity(j => j.ToTable("TripParticipants"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "TripParticipants",
+                    j => j
+                        .HasOne<ApplicationUser>()
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("FK_TripParticipants_Users_UserId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<Trip>()
+                        .WithMany()
+                        .HasForeignKey("TripId")
+                        .HasConstraintName("FK_TripParticipants_Trips_TripId")
+                        .OnDelete(DeleteBehavior.Cascade));
+
 
             // Trip → Owner
             builder.Entity<Trip>()

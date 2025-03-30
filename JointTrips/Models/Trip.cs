@@ -9,7 +9,7 @@ namespace JointTrips.Models
         [Required]
         public string Title { get; set; }
 
-        public string Description { get; set; } = "";       
+        public string Description { get; set; } = "";
 
         [Required]
         public string Destination { get; set; }
@@ -24,9 +24,9 @@ namespace JointTrips.Models
         // (ID foreign key)
         public string OwnerId { get; set; }
 
-        // (navigation property olarak)
+        // (navigation property)
         public ApplicationUser? Owner { get; set; }
-        
+
         public ICollection<ApplicationUser> Participants { get; set; } = new List<ApplicationUser>();
     }
 
