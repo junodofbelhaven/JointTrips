@@ -1,0 +1,67 @@
+﻿@model JointTrips.Models.Trip
+
+@{
+	ViewData["Title"] = "Trip Details";
+	var participantCount = Model.Participants?.Count ?? 0;
+	var isFull = participantCount >= Model.Capacity;
+	var currentUserId = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value : null;
+	var isParticipant = Model.Participants.Any(p => p.Id == currentUserId);
+	var isOwner = Model.OwnerId == currentUserId;
+}
+
+<h2>@Model.Title</h2>
+
+<div class="card">
+	<div class="card-body">
+		<p><strong>Description:</strong> @Model.Description</p>
+		<p><strong>Destination:</strong> @Model.Destination</p>
+		<p><strong>Date:</strong> @Model.Date.ToShortDateString()</p>
+		<p><strong>Owner:</strong> @Model.Owner?.UserName</p>
+		<p><strong>Capacity:</strong> @Model.Capacity</p>
+		<p><strong>Participants:</strong> @participantCount</p>
+		<p><strong>Fullness:</strong> @(participantCount) / @(Model.Capacity)</p>
+
+		@if (User.Identity.IsAuthenticated)
+		{
+			if (isOwner)
+			{
+				<span class="badge bg-primary fs-6 p-2 mb-3 d-inline-block">🎯 You are the owner of this trip.</span>
+			}
+
+			<div class="d-flex gap-2 flex-wrap mt-2 align-items-center">
+				@if (isOwner)
+				{
+					<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">
+						<i class="bi bi-pencil-square"></i> Edit
+					</a>
+					<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+						<i class="bi bi-trash"></i> Delete
+					</a>
+				}
+
+				@if (isParticipant)
+				{
+					<form asp-action="Leave" method="post" asp-route-id="@Model.Id" class="d-inline">
+						<button type="submit" class="btn btn-danger">🚪 Leave Trip</button>
+					</form>
+				}
+				else if (!isFull)
+				{
+					<form asp-action="Join" method="post" asp-route-id="@Model.Id" class="d-inline">
+						<button type="submit" class="btn btn-success">✅ Join Trip</button>
+					</form>
+				}
+				else
+				{
+					<div class="alert alert-warning mb-0">⚠️ This trip is full.</div>
+				}
+			</div>
+		}
+		else
+		{
+			<a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary mt-3">Log in to join</a>
+		}
+	</div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-4">Back to List</a>

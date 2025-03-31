@@ -1,0 +1,40 @@
+﻿@model IEnumerable<JointTrips.Models.Trip>
+
+@{
+    ViewData["Title"] = "All Trips";
+}
+
+<h2>All Trips</h2>
+
+<table class="table table-bordered table-striped mt-4">
+    <thead class="table-light">
+        <tr>
+            <th>Title</th>
+            <th>Destination</th>
+            <th>Date</th>
+            <th>Owner</th>
+            <th>Capacity</th>
+            <th>Participants</th>
+            <th>Fullness</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var trip in Model)
+        {
+            var participantCount = trip.Participants?.Count ?? 0;
+            <tr>
+                <td>@trip.Title</td>
+                <td>@trip.Destination</td>
+                <td>@trip.Date.ToShortDateString()</td>
+                <td>@trip.Owner?.UserName</td>
+                <td>@trip.Capacity</td>
+                <td>@participantCount</td>
+                <td>@(participantCount) / @(trip.Capacity)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@trip.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

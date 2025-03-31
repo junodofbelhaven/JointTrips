@@ -18,7 +18,7 @@ namespace JointTrips.Data
         {
             base.OnModelCreating(builder);
 
-            // Trip ↔ Participants
+            // Trip <-> Participants (Many-to-Many)
             builder.Entity<Trip>()
                 .HasMany(t => t.Participants)
                 .WithMany(u => u.TripsJoined)
@@ -38,7 +38,7 @@ namespace JointTrips.Data
                         .OnDelete(DeleteBehavior.Cascade));
 
 
-            // Trip → Owner
+            // Trip -> Owner (Every trip has one owner)
             builder.Entity<Trip>()
                 .HasOne(t => t.Owner)
                 .WithMany(u => u.TripsOwned)
