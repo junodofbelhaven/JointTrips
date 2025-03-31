@@ -18,11 +18,7 @@ namespace JointTrips.Controllers
             return View();
         }
 
-        public IActionResult Trips()
-        {
-            return View();
-        }
-
+        
         public IActionResult Privacy()
         {
             return View();

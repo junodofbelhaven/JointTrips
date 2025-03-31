@@ -9,8 +9,8 @@
 			<hr />
 			@if (User.Identity.IsAuthenticated)
 			{
-				<a href="/Trip/Create" class="btn btn-primary btn-lg mt-3">Create a New Trip</a>
-				<a href="/Trip" class="btn btn-outline-secondary btn-lg mt-3">View All Trips</a>
+				<a asp-controller="Trips" asp-action="Create" class="btn btn-primary btn-lg mt-3">Create a New Trip</a>
+				<a asp-controller="Trips" asp-action="Index" class="btn btn-outline-secondary btn-lg mt-3">View All Trips</a>
 			}
 			else
 			{
