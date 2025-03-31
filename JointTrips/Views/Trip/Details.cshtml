@@ -42,14 +42,12 @@
 				@if (isParticipant)
 				{
 					<form asp-action="Leave" method="post" asp-route-id="@Model.Id" class="d-inline">
-						@Html.AntiForgeryToken()
 						<button type="submit" class="btn btn-danger">🚪 Leave Trip</button>
 					</form>
 				}
 				else if (!isFull)
 				{
 					<form asp-action="Join" method="post" asp-route-id="@Model.Id" class="d-inline">
-						@Html.AntiForgeryToken()
 						<button type="submit" class="btn btn-success">✅ Join Trip</button>
 					</form>
 				}

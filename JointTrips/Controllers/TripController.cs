@@ -37,7 +37,6 @@ namespace JointTrips.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Trip trip)
         {
 
@@ -73,7 +72,6 @@ namespace JointTrips.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Join(int id)
         {
             var trip = await _context.Trips
@@ -95,7 +93,6 @@ namespace JointTrips.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Leave(int id)
         {
             var trip = await _context.Trips
@@ -129,7 +126,6 @@ namespace JointTrips.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Trip trip)
         {
             if (id != trip.Id)
@@ -146,7 +142,7 @@ namespace JointTrips.Controllers
 
             if (ModelState.IsValid)
             {
-                trip.OwnerId = existingTrip.OwnerId; 
+                trip.OwnerId = existingTrip.OwnerId;
                 _context.Update(trip);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Details), new { id = trip.Id });
@@ -169,7 +165,6 @@ namespace JointTrips.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var trip = await _context.Trips.FindAsync(id);
