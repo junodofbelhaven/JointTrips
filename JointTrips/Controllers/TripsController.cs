@@ -160,25 +160,17 @@ namespace JointTrips.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Leave(int id)
-        {
-            var trip = await _context.Trips.FindAsync(id);
-            var user = await _userManager.GetUserAsync(User);
-
-            if (trip.Participants.Any(p => p.Id == user.Id))
-            {
-                trip.Participants.Remove(user);
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToAction(nameof(Details), new { id });                       
-        }
-        
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Join(int id)
         {
-            var trip = await _context.Trips.FindAsync(id);
+            var trip = await _context.Trips
+                .Include(t => t.Participants)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (trip == null || trip.Participants.Count >= trip.Capacity)
+                return NotFound();
+
             var user = await _userManager.GetUserAsync(User);
 
             if (!trip.Participants.Any(p => p.Id == user.Id))
@@ -188,7 +180,28 @@ namespace JointTrips.Controllers
             }
 
             return RedirectToAction(nameof(Details), new { id });
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Leave(int id)
+        {
+            var trip = await _context.Trips
+                .Include(t => t.Participants)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (trip == null)
+                return NotFound();
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (trip.Participants.Any(p => p.Id == user.Id))
+            {
+                trip.Participants.Remove(user);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         private bool TripExists(int id)
