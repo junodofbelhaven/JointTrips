@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using JointTrips.Data;
 using JointTrips.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace JointTrips.Controllers
 {
     public class TripsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public TripsController(ApplicationDbContext context)
+
+        public TripsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Trips
@@ -151,6 +155,29 @@ namespace JointTrips.Controllers
             {
                 _context.Trips.Remove(trip);
             }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Leave(int id)
+        {
+            var trip = await _context.Trips.FindAsync(id);
+            if (trip != null)
+            {
+                _context.Trips.Remove(trip);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Join(int id)
+        {
+            var trip = await _context.Trips.FindAsync(id);
+            
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
