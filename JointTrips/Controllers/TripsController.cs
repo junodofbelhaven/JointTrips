@@ -40,6 +40,7 @@ namespace JointTrips.Controllers
 
             var trip = await _context.Trips
                 .Include(t => t.Owner)
+                .Include(t => t.Participants)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (trip == null)
             {

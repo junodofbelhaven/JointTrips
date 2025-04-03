@@ -54,30 +54,38 @@
 	</dl>
 </div>
 <div>
-	@{
-		if (isOwner)
-		{
-			<a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
-			<a asp-action="Delete" asp-route-id="@Model?.Id">Delete</a>
-		}
-	}
+	
+	@if (User.Identity.IsAuthenticated)
+	{
+		<div class="d-flex gap-2 flex-wrap mt-2 align-items-center">
+			@if (isOwner)
+			{
+				<a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+				<a asp-action="Delete" asp-route-id="@Model?.Id">Delete</a>
+			}
 
-	@if (isParticipant)
-	{
-		<a asp-action="Leave" asp-route-id="@Model.Id" class="btn btn-outline-warning">
-			<button type="submit" class="btn btn-danger">Leave Trip</button>
-		</a>
-	}
-	else if (!isFull)
-	{
-		<form asp-action="Join" asp-route-id="@Model.Id" class="btn btn-primary">
-			<button type="submit" class="btn btn-success">Join Trip</button>
-		</form>
+			@if (isParticipant)
+			{
+				<form asp-action="Leave" method="post" asp-route-id="@Model.Id" class="d-inline">
+					<button type="submit" class="btn btn-danger">Leave Trip</button>
+				</form>
+			}
+			else if (!isFull)
+			{
+				<form asp-action="Join" method="post" asp-route-id="@Model.Id" class="d-inline">
+					<button type="submit" class="btn btn-success">Join Trip</button>
+				</form>
+			}
+			else
+			{
+				<div class="alert alert-warning mb-0">This trip is full.</div>
+			}
+		</div>
 	}
 	else
 	{
-		<div class="alert alert-warning mb-1">This trip is full.</div>
+		<a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary mt-3">Log in to join</a>
 	}
-	
+
 	<a asp-action="Index">Back to List</a>
 </div>
