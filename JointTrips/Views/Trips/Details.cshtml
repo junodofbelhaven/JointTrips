@@ -65,13 +65,13 @@
 	@if (isParticipant)
 	{
 		<a asp-action="Leave" asp-route-id="@Model.Id" class="btn btn-outline-warning">
-			<button type="submit" class="btn btn-danger">🚪 Leave Trip</button>
+			<button type="submit" class="btn btn-danger">Leave Trip</button>
 		</a>
 	}
 	else if (!isFull)
 	{
 		<form asp-action="Join" asp-route-id="@Model.Id" class="btn btn-primary">
-			<button type="submit" class="btn btn-success">✅ Join Trip</button>
+			<button type="submit" class="btn btn-success">Join Trip</button>
 		</form>
 	}
 	else

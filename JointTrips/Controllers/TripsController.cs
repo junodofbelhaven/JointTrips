@@ -164,23 +164,31 @@ namespace JointTrips.Controllers
         public async Task<IActionResult> Leave(int id)
         {
             var trip = await _context.Trips.FindAsync(id);
-            if (trip != null)
+            var user = await _userManager.GetUserAsync(User);
+
+            if (trip.Participants.Any(p => p.Id == user.Id))
             {
-                _context.Trips.Remove(trip);
+                trip.Participants.Remove(user);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id });                       
         }
         
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Join(int id)
         {
             var trip = await _context.Trips.FindAsync(id);
-            
+            var user = await _userManager.GetUserAsync(User);
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (!trip.Participants.Any(p => p.Id == user.Id))
+            {
+                trip.Participants.Add(user);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+
         }
 
         private bool TripExists(int id)
