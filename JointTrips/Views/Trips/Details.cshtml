@@ -1,54 +1,62 @@
 ﻿@model JointTrips.Models.Trip
 
 @{
-    ViewData["Title"] = "Details";
+	ViewData["Title"] = "Details";
+	var currentUserId = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value : null;
+	var isOwner = Model.OwnerId == currentUserId;
 }
 
 <h1>Details</h1>
 
 <div>
-    <h4>Trip</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Destination)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Destination)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Date)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Date)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Capacity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Capacity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Owner)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Owner.NormalizedEmail)
-        </dd>
-    </dl>
+	<h4>Trip</h4>
+	<hr />
+	<dl class="row">
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Title)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Title)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Description)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Description)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Destination)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Destination)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Date)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Date)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Capacity)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Capacity)
+		</dd>
+		<dt class="col-sm-2">
+			@Html.DisplayNameFor(model => model.Owner)
+		</dt>
+		<dd class="col-sm-10">
+			@Html.DisplayFor(model => model.Owner.NormalizedEmail)
+		</dd>
+	</dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+	@{
+		if (isOwner)
+		{
+			<a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+			<a asp-action="Delete" asp-route-id="@Model?.Id">Delete</a>
+		}
+	}
+	<a asp-action="Index">Back to List</a>
 </div>

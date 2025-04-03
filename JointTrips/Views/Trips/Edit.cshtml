@@ -38,11 +38,11 @@
                 <input asp-for="Capacity" class="form-control" />
                 <span asp-validation-for="Capacity" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div hidden class="form-group">
                 <label asp-for="OwnerId" class="control-label"></label>
                 <select asp-for="OwnerId" class="form-control" asp-items="ViewBag.OwnerId"></select>
                 <span asp-validation-for="OwnerId" class="text-danger"></span>
-            </div>
+            </div> <br />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
