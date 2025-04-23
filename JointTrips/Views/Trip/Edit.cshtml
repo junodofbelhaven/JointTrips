@@ -9,6 +9,8 @@
 <form asp-action="Edit" method="post">
 
     <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="RowVersion" />
+
 
     <div class="mb-3">
         <label asp-for="Title" class="form-label"></label>
@@ -43,6 +45,17 @@
     <button type="submit" class="btn btn-primary">Save Changes</button>
     <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary ms-2">Cancel</a>
 </form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger mt-4">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
 
 @section Scripts {
     @{

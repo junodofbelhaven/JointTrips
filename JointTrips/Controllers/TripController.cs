@@ -136,22 +136,45 @@ namespace JointTrips.Controllers
             ModelState.Remove("Owner");
 
             var user = await _userManager.GetUserAsync(User);
-            var existingTrip = await _context.Trips.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
 
-            if (existingTrip == null || (existingTrip.OwnerId != user.Id && existingTrip.SecondaryOwnerId != user.Id))
+            var tripToUpdate = await _context.Trips
+                .Include(t => t.Participants)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (tripToUpdate == null || (tripToUpdate.OwnerId != user.Id && tripToUpdate.SecondaryOwnerId != user.Id))
                 return Unauthorized();
+
+            if (trip.Capacity < tripToUpdate.Participants.Count)
+            {
+                ModelState.AddModelError("", $"There are already {tripToUpdate.Participants.Count} participants. Capacity cannot be lower.");
+                return View(trip);
+            }
 
             if (ModelState.IsValid)
             {
-                trip.OwnerId = existingTrip.OwnerId;
-                trip.SecondaryOwnerId = existingTrip.SecondaryOwnerId;
-                _context.Update(trip);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Details), new { id = trip.Id });
+                _context.Entry(tripToUpdate).Property("RowVersion").OriginalValue = trip.RowVersion;
+
+                tripToUpdate.Title = trip.Title;
+                tripToUpdate.Description = trip.Description;
+                tripToUpdate.Destination = trip.Destination;
+                tripToUpdate.Date = trip.Date;
+                tripToUpdate.Capacity = trip.Capacity;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Details), new { id = trip.Id });
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    ModelState.AddModelError("", "Another user has updated this trip. Please reload and try again.");
+                    return View(trip);
+                }
             }
 
             return View(trip);
         }
+
 
         public async Task<IActionResult> Delete(int id)
         {

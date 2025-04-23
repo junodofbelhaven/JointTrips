@@ -30,6 +30,9 @@ namespace JointTrips.Models
 
         public ICollection<ApplicationUser> Participants { get; set; } = new List<ApplicationUser>();
 
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
 
     }
 
