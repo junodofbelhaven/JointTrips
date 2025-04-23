@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace JointTrips.Models
 {
@@ -21,13 +22,14 @@ namespace JointTrips.Models
         [Range(1, 100)]
         public int Capacity { get; set; }
 
-        // (ID foreign key)
         public string OwnerId { get; set; }
+        public ApplicationUser Owner { get; set; }
 
-        // (navigation property)
-        public ApplicationUser? Owner { get; set; }
+        public string? SecondaryOwnerId { get; set; }
+        public ApplicationUser? SecondaryOwner { get; set; }
 
         public ICollection<ApplicationUser> Participants { get; set; } = new List<ApplicationUser>();
+
     }
 
 }

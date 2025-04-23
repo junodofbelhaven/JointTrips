@@ -34,7 +34,7 @@ namespace JointTrips.Migrations
 
                     b.HasIndex("TripsJoinedId");
 
-                    b.ToTable("ApplicationUserTrip");
+                    b.ToTable("TripParticipants", (string)null);
                 });
 
             modelBuilder.Entity("JointTrips.Models.ApplicationUser", b =>
@@ -128,6 +128,9 @@ namespace JointTrips.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("SecondaryOwnerId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -135,6 +138,8 @@ namespace JointTrips.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("SecondaryOwnerId");
 
                     b.ToTable("Trips");
                 });
@@ -299,7 +304,14 @@ namespace JointTrips.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("JointTrips.Models.ApplicationUser", "SecondaryOwner")
+                        .WithMany()
+                        .HasForeignKey("SecondaryOwnerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Owner");
+
+                    b.Navigation("SecondaryOwner");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
