@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace JointTrips.Controllers
 {
@@ -119,7 +120,7 @@ namespace JointTrips.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
-            if (trip == null || trip.OwnerId != user.Id)
+            if (trip == null || (trip.OwnerId != user.Id && trip.SecondaryOwnerId != user.Id))
                 return Unauthorized();
 
             return View(trip);
@@ -137,12 +138,13 @@ namespace JointTrips.Controllers
             var user = await _userManager.GetUserAsync(User);
             var existingTrip = await _context.Trips.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
 
-            if (existingTrip == null || existingTrip.OwnerId != user.Id)
+            if (existingTrip == null || (existingTrip.OwnerId != user.Id && existingTrip.SecondaryOwnerId != user.Id))
                 return Unauthorized();
 
             if (ModelState.IsValid)
             {
                 trip.OwnerId = existingTrip.OwnerId;
+                trip.SecondaryOwnerId = existingTrip.SecondaryOwnerId;
                 _context.Update(trip);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Details), new { id = trip.Id });
@@ -158,7 +160,7 @@ namespace JointTrips.Controllers
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             var user = await _userManager.GetUserAsync(User);
-            if (trip == null || trip.OwnerId != user.Id)
+            if (trip == null || (trip.OwnerId != user.Id && trip.SecondaryOwnerId != user.Id))
                 return Unauthorized();
 
             return View(trip);
@@ -170,13 +172,54 @@ namespace JointTrips.Controllers
             var trip = await _context.Trips.FindAsync(id);
 
             var user = await _userManager.GetUserAsync(User);
-            if (trip == null || trip.OwnerId != user.Id)
+            if (trip == null || (trip.OwnerId != user.Id && trip.SecondaryOwnerId != user.Id))
                 return Unauthorized();
 
             _context.Trips.Remove(trip);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageOwnership(int id)
+        {
+            var trip = await _context.Trips
+                .Include(t => t.Owner)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (trip == null || trip.OwnerId != currentUserId)
+                return Forbid();
+
+            ViewBag.Users = _context.Users
+                .Where(u => u.Id != currentUserId)
+                .ToList();
+
+            return View(trip);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ManageOwnership(int id, string secondaryOwnerId)
+        {
+            var trip = await _context.Trips.FindAsync(id);
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (trip == null || trip.OwnerId != currentUserId)
+                return Forbid();
+
+            if (secondaryOwnerId == currentUserId)
+            {
+                ModelState.AddModelError("", "You cannot assign ownership to yourself.");
+                return View(trip);
+            }
+
+            trip.SecondaryOwnerId = string.IsNullOrWhiteSpace(secondaryOwnerId) ? null : secondaryOwnerId;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = trip.Id });
+        }
+
 
     }
 }
