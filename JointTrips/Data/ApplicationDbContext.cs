@@ -18,27 +18,11 @@ namespace JointTrips.Data
         {
             base.OnModelCreating(builder);
 
-            // Trip <-> Participants (Many-to-Many)
             builder.Entity<Trip>()
                 .HasMany(t => t.Participants)
-                .WithMany(u => u.TripsJoined)
-                .UsingEntity<Dictionary<string, object>>(
-                    "TripParticipants",
-                    j => j
-                        .HasOne<ApplicationUser>()
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_TripParticipants_Users_UserId")
-                        .OnDelete(DeleteBehavior.Cascade),
-                    j => j
-                        .HasOne<Trip>()
-                        .WithMany()
-                        .HasForeignKey("TripId")
-                        .HasConstraintName("FK_TripParticipants_Trips_TripId")
-                        .OnDelete(DeleteBehavior.Cascade));
+                .WithMany(u => u.TripsJoined);
 
 
-            // Trip -> Owner (Every trip has one owner)
             builder.Entity<Trip>()
                 .HasOne(t => t.Owner)
                 .WithMany(u => u.TripsOwned)
