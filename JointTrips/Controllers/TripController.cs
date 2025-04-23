@@ -73,25 +73,43 @@ namespace JointTrips.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Join(int id)
+        public async Task<IActionResult> Join(int id, string rowVersion)
         {
             var trip = await _context.Trips
                 .Include(t => t.Participants)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            if (trip == null || trip.Participants.Count >= trip.Capacity)
+            if (trip == null)
                 return NotFound();
 
             var user = await _userManager.GetUserAsync(User);
 
-            if (!trip.Participants.Any(p => p.Id == user.Id))
+            if (trip.Participants.Any(p => p.Id == user.Id))
+                return RedirectToAction(nameof(Details), new { id });
+
+            if (trip.Participants.Count >= trip.Capacity)
             {
-                trip.Participants.Add(user);
+                TempData["Error"] = "Trip is already full.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            _context.Entry(trip).Property("RowVersion").OriginalValue = Convert.FromBase64String(rowVersion);
+
+            trip.Participants.Add(user);
+
+            try
+            {
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "You have successfully joined the trip!";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["Error"] = "Trip data was modified by another user. Please try again.";
             }
 
             return RedirectToAction(nameof(Details), new { id });
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Leave(int id)
