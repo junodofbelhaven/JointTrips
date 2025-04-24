@@ -43,6 +43,8 @@ namespace JointTrips.Controllers
 
             ModelState.Remove("OwnerId");
             ModelState.Remove("Owner");
+            ModelState.Remove("RowVersion");
+
 
             if (ModelState.IsValid)
             {
@@ -89,8 +91,8 @@ namespace JointTrips.Controllers
 
             
 
+
             _context.Entry(trip).Property("RowVersion").OriginalValue = Convert.FromBase64String(rowVersion);
-                        
             trip.Participants.Add(user);
             _context.Entry(trip).Property(nameof(Trip.Capacity)).IsModified = true;
 
